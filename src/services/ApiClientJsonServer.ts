@@ -22,6 +22,17 @@ const axiosIstance = axios.create({
         return res.data
     }
     async getAll(searchObject?: SearchObject): Promise<Employee[]> {
+        if (searchObject) {
+            const params: Record<string, string | number> = {};
+            if (searchObject.department) params.department = searchObject.department;
+            if (searchObject.salaryFrom) params.salary_gte = searchObject.salaryFrom;
+            if (searchObject.salaryTo) params.salary_lte = searchObject.salaryTo;
+            if (searchObject.ageFrom) params.age_gte = searchObject.ageFrom;
+            if (searchObject.ageTo) params.age_lte = searchObject.ageTo;
+
+            const res = await axiosIstance.get<Employee[]>("/", { params });
+            return res.data;
+        }
         const res = await axiosIstance.get<Employee[]>("/");
         return res.data;
     }
