@@ -1,70 +1,35 @@
-import { useQuery } from "@tanstack/react-query";
-import { Employee } from "../model/dto-types";
-import apiClient from "../services/ApiClientJsonServer";
-import { Avatar, Spinner, Stack, Table, Text } from "@chakra-ui/react";
-import { AxiosError } from "axios";
+import { FC } from "react"
+import { DepartmentInfo } from "../pages/DepartmentStatisticsPage"
+import { HStack, Table } from "@chakra-ui/react"
 
-const EmployeesTable = () => {
-  const {
-    data: employees,
-    error,
-    isLoading,
-  } = useQuery<Employee[], AxiosError>({
-    queryKey: ["employees"],
-    queryFn: () => apiClient.getAll(),
-    staleTime: 3600_000
-  });
+interface Props {
+    depStatistics: DepartmentInfo[]
+}
+const DepartmentStatisticsTable: FC<Props> = ({depStatistics}) => {
   return (
-    <>
-      {error ? 
-        <Text color={"red"} fontSize={"2xl"}>{error.message}</Text>
-      : 
-        <>
-          {isLoading && <Spinner />}
-          <Stack
-            height={"100%"}
-            justifyContent={"center"}
-            alignItems={"center"}
-          >
-            <Table.ScrollArea
-              borderWidth="1px"
-              rounded="md"
-              height="80vh"
-              width="80vw"
-            >
-              <Table.Root size="sm" stickyHeader>
-                <Table.Header>
-                  <Table.Row bg="bg.subtle" zIndex="0">
-                    <Table.ColumnHeader></Table.ColumnHeader>
-                    <Table.ColumnHeader>Full Name</Table.ColumnHeader>
-                    <Table.ColumnHeader>Department</Table.ColumnHeader>
-                    <Table.ColumnHeader>Salary</Table.ColumnHeader>
-                    <Table.ColumnHeader>Birthday</Table.ColumnHeader>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body  zIndex="-100">
-                  {employees?.map((empl) => (
-                    <Table.Row key={empl.id} >
-                      <Table.Cell>
-                        <Avatar.Root shape="full" size="lg">
-                          <Avatar.Fallback name={empl.fullName} />
-                          <Avatar.Image src={empl.avatar} />
-                        </Avatar.Root>
-                      </Table.Cell>
-                      <Table.Cell>{empl.fullName}</Table.Cell>
-                      <Table.Cell>{empl.department}</Table.Cell>
-                      <Table.Cell>{empl.salary}</Table.Cell>
-                      <Table.Cell>{empl.birthDate}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </Table.ScrollArea>
-          </Stack>
-        </>
-      }
-    </>
-  );
-};
+    <HStack justifyContent={"center"}>
+        <Table.Root size="sm" showColumnBorder width={"60vw"} height={"50vh"} alignItems={"center"}>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>Department</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="end">Number of Employees</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="end">Average Salary</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="end">Average Age</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {depStatistics.map((item) => (
+              <Table.Row key={item.department}>
+                <Table.Cell>{item.department}</Table.Cell>
+                <Table.Cell textAlign="end">{item.nEmployees}</Table.Cell>
+                <Table.Cell textAlign="end">{item.avgSalary}</Table.Cell>
+                <Table.Cell textAlign="end">{item.avgAge}</Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table.Root>
+    </HStack>
+  )
+}
 
-export default EmployeesTable;
+export default DepartmentStatisticsTable
